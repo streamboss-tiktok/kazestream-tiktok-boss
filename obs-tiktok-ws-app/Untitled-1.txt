@@ -1,0 +1,2 @@
+<div id="boss-buddies"></div>
+<div id="buddy-name"></div>

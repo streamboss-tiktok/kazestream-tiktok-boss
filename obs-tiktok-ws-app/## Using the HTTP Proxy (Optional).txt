@@ -1,0 +1,12 @@
+## Using the HTTP Proxy (Optional)
+
+If you are running the optional Node.js HTTP proxy (see `ws-proxy.js`), you can fetch events from your frontend or overlay like this:
+
+```javascript
+fetch("http://localhost:3000/events")
+    .then(response => response.json())
+    .then(data => console.log("Received events:", data.events))
+    .catch(error => console.error("Error fetching events:", error));
+```
+
+This allows your overlay to receive TikTok events even if it cannot connect directly to the WebSocket.
