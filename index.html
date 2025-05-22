@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kazestream TikTok Boss</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="boss-container">
+      <div id="boss-name">Boss: ???</div>
+      <canvas id="sprite-canvas" width="128" height="128"></canvas>
+      <div id="buddy-name"></div>
+      <div id="health-bar-container">
+        <img src="assets/images/health.png" alt="Health" class="bar-icon" />
+        <div class="bar-area">
+          <div id="shield-bar"></div>
+          <div id="health-bar"></div>
+        </div>
+        <img src="assets/images/shield.png" alt="Shield" class="bar-icon" />
+        <span class="shield-coin">
+          299 <img src="assets/images/coin.png" alt="Coin" class="coin-icon" />
+        </span>
+      </div>
+      <div id="shield-cooldown" class="shield-cooldown">
+        Shield Cooldown: <span id="cooldown-timer">5:00</span>
+      </div>
+      <div id="overlay-guide" class="overlay-guide">
+        <strong>How to Play:</strong>
+        <ul>
+          <li>
+            Send chat messages or tap/like to attack the boss (1 damage each).
+          </li>
+          <li>
+            Send gifts (type <code>coin [amount]</code> in chat) to deal even
+            more damage!
+          </li>
+          <li>The boss can heal and activate a shield by sending coins.</li>
+          <li>Type <code>share</code> in chat to deal a big hit!</li>
+          <li>
+            Boss resets every Sunday at midnight. All-time longest boss is shown
+            on defeat!
+          </li>
+        </ul>
+      </div>
+      <div id="leaderboard">
+        <h3>Top Attackers</h3>
+        <ol id="leaderboard-list"></ol>
+      </div>
+      <div id="event-message" class="event-message"></div>
+      <div id="gifts"></div>
+      <div id="error-message" class="error-message"></div>
+      <div id="last-attacker"></div>
+    </div>
+    <audio id="hit-sound" src="sounds/hit.mp3"></audio>
+    <audio id="kill-sound" src="sounds/kill.mp3"></audio>
+    <audio id="shield-sound" src="sounds/shield-on.mp3"></audio>
+    <audio id="shield-depleted-sound" src="sounds/shield-depleted.mp3"></audio>
+
+    <script>
+      // --- CONFIG & STATE ---
+      let bossName = "???";
+      let bossSet = false;
+      let currentHealth = 2000;
+      let shield = 0;
+      let lastAttacker = "";
+      let leaderboard = {};
+      const MAX_HEALTH = 2000;
+      const SHIELD_COST = 299;
+
+      // --- UI UPDATE FUNCTIONS ---
+      function updateBars() {
+        const hp = document.getElementById("health-bar");
+        const sp = document.getElementById("shield-bar");
+        hp.style.width = `${(currentHealth / MAX_HEALTH) * 100}%`;
+        sp.style.width = `${(shield / MAX_HEALTH) * 100}%`;
+        document.getElementById(
+          "last-attacker"
+        ).textContent = `Last Attacker: ${lastAttacker || "None"}`;
+      }
+
+      function updateLeaderboard(username, amount, profilePic) {
+        if (!leaderboard[username])
+          leaderboard[username] = { score: 0, profilePic };
+        leaderboard[username].score += amount;
+        renderLeaderboard();
+      }
+
+      function renderLeaderboard() {
+        const list = document.getElementById("leaderboard-list");
+        list.innerHTML = "";
+        Object.entries(leaderboard)
+          .sort((a, b) => b[1].score - a[1].score)
+          .slice(0, 5)
+          .forEach(([user, data]) => {
+            const li = document.createElement("li");
+            li.innerHTML = `<img src="${data.profilePic}" width="20" height="20" style="vertical-align:middle;border-radius:50%;"> ${user}: ${data.score}`;
+            list.appendChild(li);
+          });
+      }
+
+      function showGift(user, amount, giftName = "", giftIconUrl = "") {
+        const giftsDiv = document.getElementById("gifts");
+        const el = document.createElement("div");
+        el.className = "gift";
+        let giftDisplay = "";
+        if (giftIconUrl) {
+          giftDisplay = `<img src="${giftIconUrl}" alt="${giftName}" class="gift-icon" />`;
+        } else if (giftName) {
+          giftDisplay = giftName;
+        } else {
+          giftDisplay = "🎁";
+        }
+        el.innerHTML = `${giftDisplay} ${user} sent ${amount} coins!`;
+        giftsDiv.appendChild(el);
+        setTimeout(() => giftsDiv.removeChild(el), 5000);
+      }
+
+      function showEventMessage(msg, color = "#fff") {
+        const eventMsg = document.getElementById("event-message");
+        eventMsg.textContent = msg;
+        eventMsg.style.color = color;
+        eventMsg.style.display = "block";
+        setTimeout(() => (eventMsg.style.display = "none"), 3000);
+      }
+
+      function setBoss(name) {
+        bossName = name;
+        document.getElementById("boss-name").textContent = `Boss: ${bossName}`;
+        bossSet = name !== "???";
+        currentHealth = MAX_HEALTH;
+        shield = 0;
+        updateBars();
+      }
+
+      // --- DAMAGE & HEAL LOGIC ---
+      function heal(amount) {
+        currentHealth = Math.min(currentHealth + amount, MAX_HEALTH);
+        updateBars();
+      }
+
+      function activateShield() {
+        if (shield > 0) return; // Already shielded
+        shield = MAX_HEALTH;
+        updateBars();
+        document.getElementById("shield-sound").play();
+        setTimeout(() => {
+          shield = 0;
+          updateBars();
+          document.getElementById("shield-depleted-sound").play();
+        }, 5000);
+      }
+
+      function takeDamage(amount, attacker) {
+        if (attacker) lastAttacker = attacker;
+        if (shield > 0) {
+          shield -= amount;
+          if (shield < 0) {
+            currentHealth += shield; // shield is negative, so this subtracts overflow from health
+            shield = 0;
+            document.getElementById("shield-depleted-sound").play();
+            showEventMessage("Shield Depleted!", "#888");
+          }
+        } else {
+          currentHealth -= amount;
+        }
+        if (currentHealth <= 0) {
+          document.getElementById("kill-sound").play();
+          showEventMessage(
+            `Boss Defeated by ${lastAttacker || "Unknown"}!`,
+            "#e74c3c"
+          );
+          setBoss("???");
+          bossSet = false;
+          leaderboard = {};
+          renderLeaderboard();
+        }
+        updateBars();
+      }
+
+      // --- WEBSOCKET HANDLING ---
+      const ws = new WebSocket("ws://localhost:21213/");
+
+      ws.onopen = () => {
+        console.log("Connected to TikFinity WebSocket");
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.event === "chat" && msg.data) {
+            const text = (msg.data.text || "").toLowerCase();
+            const username = msg.data.username || "Anonymous";
+            const profilePic = msg.data.profilePictureUrl || "";
+            const coinMatch = text.match(/coin\s*(\d+)/);
+            if (coinMatch) {
+              const amount = parseInt(coinMatch[1], 10);
+              updateLeaderboard(username, amount, profilePic);
+              window.receiveEvent("coin", amount, username);
+              showGift(username, amount);
+            }
+          }
+          if (msg.event === "like" && msg.data) {
+            const username = msg.data.username || "Anonymous";
+            const profilePic = msg.data.profilePictureUrl || "";
+            if (username !== bossName) {
+              updateLeaderboard(username, 1, profilePic);
+              window.receiveEvent("like", 1, username);
+            }
+          }
+          if (msg.event === "share" && msg.data) {
+            const username = msg.data.username || "Anonymous";
+            const profilePic = msg.data.profilePictureUrl || "";
+            if (username !== bossName) {
+              updateLeaderboard(username, 10, profilePic);
+              window.receiveEvent("share", 1, username);
+            }
+          }
+          if (msg.event === "gift" && msg.data) {
+            if (msg.data.giftType === 1 && !msg.data.repeatEnd) {
+              // Streak in progress, show temporary
+            } else {
+              const username = msg.data.username || "Anonymous";
+              const profilePic = msg.data.profilePictureUrl || "";
+              const amount = msg.data.coinAmount || 1;
+              const giftName = msg.data.giftName || "";
+              const giftIconUrl = msg.data.giftIconUrl || "";
+              updateLeaderboard(username, amount, profilePic);
+              window.receiveEvent("coin", amount, username);
+              showGift(username, amount, giftName, giftIconUrl);
+            }
+          }
+          if (msg.event === "follow" && msg.data) {
+            showEventMessage(`${msg.data.username} followed!`, "#0ff");
+          }
+          if (msg.event === "subscribe" && msg.data) {
+            showEventMessage(`${msg.data.username} subscribed!`, "#ff0");
+          }
+          if (msg.event === "member" && msg.data) {
+            showEventMessage(`${msg.data.username} joined the stream!`, "#fff");
+          }
+        } catch (e) {
+          console.error("WebSocket message error:", e);
+        }
+      };
+
+      ws.onerror = (err) => {
+        console.error("WebSocket error:", err);
+        document.getElementById("error-message").textContent =
+          "WebSocket error. Please check your connection.";
+      };
+
+      // --- MAIN EVENT HANDLER ---
+      window.receiveEvent = function (type, value, attacker) {
+        if (type === "coin") {
+          if (!bossSet && value >= 1) {
+            setBoss(attacker);
+            bossSet = true;
+          } else if (attacker === bossName) {
+            heal(value * 2);
+            if (value >= SHIELD_COST) activateShield();
+          } else {
+            takeDamage(value, attacker);
+          }
+        } else if (type === "like" && attacker !== bossName) {
+          takeDamage(1, attacker);
+        } else if (type === "share" && attacker !== bossName) {
+          takeDamage(10, attacker);
+        }
+      };
+
+      // --- INITIALIZE ---
+      document.addEventListener("DOMContentLoaded", () => {
+        setBoss("???");
+        updateBars();
+        renderLeaderboard();
+      });
+    </script>
+  </body>
+</html>
