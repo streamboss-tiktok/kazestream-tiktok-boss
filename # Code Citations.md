@@ -2,6 +2,15 @@
 
 ## License: unknown
 
-[Messages.module.css on GitHub][Def]
+[example.html on GitHub](https://github.com/invoiceninja/invoiceninja/tree/28377fa73007aa32f702c0e014a44f9d64430c99/tests/Feature/PdfMaker/example.html)
 
-[Def]: https://github.com/henryvalbuena/latte-machine/tree/23954699032f748444f0f9fe805fbd707e54e65e/src/components/user/Messages.module.css
+```html
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /
+  </head>
+</html>
+```

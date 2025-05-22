@@ -1,20 +1,107 @@
-.shield-cooldown {
-  margin-top: 8px;
-  color: #3498db;
-  font-size: 14px;
-  display: none;
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+body {
+  font-family: "Press Start 2P", monospace;
+  color: white;
+  background: transparent;
 }
 
-.last-attacker {
-  margin-top: 8px;
-  color: #888;
-  font-size: 14px;
+h1,
+h2,
+h3,
+#boss-name {
+  color: red;
+}
+
+.bar-icon,
+.coin-icon {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  object-fit: contain;
+}
+
+.gift-icon {
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+@keyframes pulse {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+#boss-name,
+.bar-icon,
+.coin-icon {
+  animation: pulse 1.5s infinite;
+}
+
+#health-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.bar-area {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 200px; /* Adjust as needed */
+  gap: 4px;
+}
+
+#shield-bar {
+  height: 16px;
+  background: rgba(0, 255, 255, 0.7);
+  border-radius: 6px;
+  transition: width 0.3s;
+  width: 0%;
+  margin-bottom: 2px;
+}
+
+#health-bar {
+  height: 16px;
+  background: green;
+  border-radius: 6px;
+  transition: width 0.3s;
+  width: 0%;
+}
+
+#overlay-guide,
+#overlay-guide strong,
+#overlay-guide ul,
+#overlay-guide li,
+#overlay-guide code {
+  color: red;
 }
 
 .event-message {
-  margin-top: 8px;
-  color: #e67e22;
+  margin-top: 12px;
   font-size: 16px;
+  color: yellow;
+  text-align: center;
+}
+
+.error-message {
+  color: #e74c3c;
   font-weight: bold;
-  display: none;
+  margin-top: 10px;
+  text-align: center;
+}
+
+#last-attacker {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #aaa;
 }
