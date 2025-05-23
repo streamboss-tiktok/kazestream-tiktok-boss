@@ -4,27 +4,7 @@ body {
   font-family: "Press Start 2P", monospace;
   color: white;
   background: transparent;
-}
 
-h1,
-h2,
-h3,
-#boss-name {
-  color: red;
-}
-
-.bar-icon,
-.coin-icon {
-  width: 24px;
-  height: 24px;
-  vertical-align: middle;
-  object-fit: contain;
-}
-
-.gift-icon {
-  width: 32px;
-  height: 32px;
-  vertical-align: middle;
   margin-right: 6px;
 }
 
@@ -42,7 +22,7 @@ h3,
 
 #boss-name,
 .bar-icon,
-.coin-icon {
+#boss-health-bar {
   animation: pulse 1.5s infinite;
 }
 

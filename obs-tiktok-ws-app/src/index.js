@@ -3,21 +3,17 @@ import WebSocketClient, { WS_URL } from "./wsClient.js";
 const wsClient = new WebSocketClient(
   WS_URL,
   (chat) => {
-    // Custom logic here
     console.log(`[Chat] ${chat.username}: ${chat.text}`);
     // e.g., forward to overlay, save to DB, etc.
   },
   (gift) => {
     console.log(`[Gift] ${gift.username} sent a gift!`);
-    // Custom logic for gifts
   },
   (like) => {
     console.log(`[Like] ${like.username} liked the stream!`);
-    // Custom logic for likes
   },
   (follow) => {
     console.log(`[Follow] ${follow.username} followed!`);
-    // Custom logic for follows
   }
 );
 
@@ -33,3 +29,27 @@ wsClient.onClose = () => {
 };
 
 wsClient.connect();
+
+function showBuddy(buddyNumber = 1) {
+  const container = document.getElementById("boss-container") || document.body;
+  let buddyImg = document.getElementById("buddy-img");
+  if (!buddyImg) {
+    buddyImg = document.createElement("img");
+    buddyImg.id = "buddy-img";
+    buddyImg.alt = "Buddy";
+    container.appendChild(buddyImg);
+  }
+  buddyImg.src = `assets/images/buddy${buddyNumber}.png`;
+}
+
+// Make sure this runs after the DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  showBuddy(1); // Show buddy1.png on load
+});
+
+// Sound effects
+const shieldOnSound = new Audio("assets/sounds/shield-on.mp3");
+const shieldDepletedSound = new Audio("assets/sounds/shield-depleted.mp3");
+
+// Example usage:
+// shieldOnSound.play();
