@@ -53,3 +53,13 @@ const shieldDepletedSound = new Audio("assets/sounds/shield-depleted.mp3");
 
 // Example usage:
 // shieldOnSound.play();
+
+function updateBars() {
+  document.getElementById("health-bar").style.width =
+    (currentHealth / MAX_HEALTH) * 100 + "%";
+  document.getElementById("shield-bar").style.width =
+    (shield / MAX_HEALTH) * 100 + "%";
+}
+function showCurrentBuddyAndBoss() {
+  // ...show buddy sprite and boss name...
+}

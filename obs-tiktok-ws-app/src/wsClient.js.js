@@ -75,5 +75,13 @@ class WebSocketClient {
   }
 }
 
+function updateBars() {
+  document.getElementById("health-bar").style.width = (currentHealth / MAX_HEALTH * 100) + "%";
+  document.getElementById("shield-bar").style.width = (shield / MAX_HEALTH * 100) + "%";
+}
+function showCurrentBuddyAndBoss() {
+  // ...show buddy sprite and boss name...
+}
+
 export default WebSocketClient;
 export const WS_URL = process.env.WS_URL || "ws://localhost:21213";

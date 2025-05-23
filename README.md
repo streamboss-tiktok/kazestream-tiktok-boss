@@ -15,15 +15,16 @@ Enjoy hosting your engaging stream game!
 
 2. **Add an Action in Streamer.bot → Send to Stream Boss**
 
-   - **Trigger type:** WebSocket Client Message
-   - **Trigger it when you receive TikTok events and send this JSON:**
+- **Trigger type:** WebSocket Client Message
 
-     ```json
-     {
-       "user": "{user}",
-       "type": "{type}", 
-       "amount": {amount}
-     }
-     ```
+  - **Trigger it when you receive TikTok events and send this JSON:**
 
-   - Replace `{type}` with `"coin"`, `"like"`, or `"share"`.
+    ```json
+    {
+      "user": "{user}",
+      "type": "{type}",
+      "amount": {amount}
+    }
+    ```
+
+  - Replace `{type}` with `"coin"`, `"like"`, or `"share"`.
