@@ -81,3 +81,32 @@ function updateBars() {
 function showCurrentBuddyAndBoss() {
   // ...show buddy sprite and boss name...
 }
+
+let bossActive = false;
+let bossName = "???";
+let currentBuddyIndex = 0;
+let MAX_HEALTH = 100;
+let currentHealth = MAX_HEALTH;
+let shield = 0;
+let leaderboard = {};
+
+const BossNames = Array.from({ length: 14 }, (_, i) => `Boss${i + 1}`);
+
+tikTokLiveConnection.on(WebcastEvent.GIFT, (msg) => {
+  console.log("Gift received:", msg); // <-- You should see this in your terminal
+  if (!bossActive) {
+    bossActive = true;
+    bossName = msg.user;
+    currentHealth = MAX_HEALTH;
+    shield = 0;
+    leaderboard = {};
+    io.emit("bossReset", {
+      newBuddyIndex: currentBuddyIndex,
+      newBossUsername: bossName,
+    });
+    io.emit("updateHealth", { health: currentHealth, shieldValue: shield });
+    io.emit("updateLeaderboard", leaderboard);
+  }
+  io.emit("giftReceived", { username: msg.user });
+  // ...rest of your gift logic...
+});

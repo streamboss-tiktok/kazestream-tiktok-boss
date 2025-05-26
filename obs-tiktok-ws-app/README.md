@@ -712,4 +712,7 @@ window.registerOverlayPlugin({
 ---
 
 With a plugin system, your overlay can grow and adapt to new TikTok events, custom widgets, or third-party integrations—without changing your core codebase!
+
+const BossNames = Array.from({ length: 14 }, (\_, i) => `Boss${i + 1}`);
+// ...and so on
 ````

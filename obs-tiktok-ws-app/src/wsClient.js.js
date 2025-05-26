@@ -81,36 +81,107 @@ function updateBars() {
   document.getElementById("shield-bar").style.width =
     (shield / MAX_HEALTH) * 100 + "%";
 }
-function showCurrentBuddyAndBoss() {
-  // Show buddy sprite on canvas
-  showBuddyOnCanvas(currentBuddy);
-  // Only show the boss username below the sprite, no buddy name or buddy image
-  document.getElementById("buddy-name").innerHTML = `
+function showCurrentBossAndBoss() {
+  // Show Boss sprite on canvas
+  showBossOnCanvas(currentBoss);
+  // Only show the boss username below the sprite, no Boss name or Boss image
+  document.getElementById("Boss-name").innerHTML = `
     <span class="boss-username">${bossName}</span>
   `;
   document.getElementById("boss-name").textContent = `Boss: ${bossName}`;
 }
 
-function setBuddySprite(index) {
-  const buddiesDiv = document.getElementById("boss-buddies");
-  buddiesDiv.innerHTML = "";
-  const name = buddyNames[index];
+function setBossSprite(index) {
+  const bossesDiv = document.getElementById("boss-bosses");
+  bossesDiv.innerHTML = "";
+  const name = BossNames[index];
   const img = document.createElement("img");
   img.src = `assets/images/${name}.png`;
   img.alt = "Boss Sprite";
-  img.className = "buddy-sprite";
-  img.id = `buddy-${name}`;
-  buddiesDiv.appendChild(img);
+  img.className = "boss-sprite";
+  img.id = `boss-${name}`;
+  bossesDiv.appendChild(img);
 
   // Show only the boss username below the sprite
   let bossNameDiv = document.getElementById("boss-name");
   if (!bossNameDiv) {
     bossNameDiv = document.createElement("div");
     bossNameDiv.id = "boss-name";
-    buddiesDiv.parentNode.insertBefore(bossNameDiv, buddiesDiv.nextSibling);
+    bossesDiv.parentNode.insertBefore(bossNameDiv, bossesDiv.nextSibling);
   }
   bossNameDiv.innerHTML = `<span class="boss-username">${bossName}</span>`;
 }
 
-export default WebSocketClient;
-export const WS_URL = process.env.WS_URL || "ws://localhost:21213";
+const BossNames = Array.from({ length: 14 }, (_, i) => `Boss${i + 1}`);
+
+function showHowToPlayTemporarily() {
+  const howToPlay = document.getElementById("how-to-play");
+  howToPlay.style.display = "block";
+  clearTimeout(showHowToPlayTemporarily._timeout);
+  showHowToPlayTemporarily._timeout = setTimeout(() => {
+    howToPlay.style.display = "none";
+  }, 5000);
+}
+
+// On initial load
+showHowToPlayTemporarily();
+
+// On boss respawn (e.g., in your bossReset handler)
+socket.on("bossReset", ({ newBossIndex, newBossUsername }) => {
+  // ...existing boss reset logic...
+  showHowToPlayTemporarily();
+});
+
+const socket = new WebSocket("ws://localhost:21213/");
+
+// Example boss state and hit handler
+const boss = {
+  name: "???",
+  hp: 2000,
+  maxHp: 2000,
+  shield: 0,
+  cooldown: false,
+};
+
+function handleEvent({ user, type, amount }) {
+  // Your logic to update boss state, leaderboard, etc.
+  console.log(`Event: ${type} from ${user} (${amount})`);
+}
+
+function onBossHit() {
+  // Your animation or UI update logic
+  console.log("Boss was hit!");
+}
+
+socket.onopen = () => {
+  console.log("WebSocket connected");
+};
+
+socket.onmessage = (event) => {
+  try {
+    const data = JSON.parse(event.data);
+    if (["coin", "like", "share"].includes(data.type)) {
+      handleEvent({
+        user: data.user || "Viewer",
+        type: data.type,
+        amount: data.amount || 1,
+      });
+      onBossHit();
+    }
+    if (data.type === "giftReceived") {
+      console.log("Gift received on overlay:", data);
+      onBossHit();
+    }
+    // Handle other event types as needed
+  } catch (e) {
+    console.error("Invalid event", e);
+  }
+};
+
+socket.onerror = (err) => {
+  console.error("WebSocket error:", err);
+};
+
+socket.onclose = () => {
+  console.log("WebSocket disconnected");
+};

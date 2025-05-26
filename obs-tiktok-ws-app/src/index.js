@@ -30,21 +30,21 @@ wsClient.onClose = () => {
 
 wsClient.connect();
 
-function showBuddy(buddyNumber = 1) {
+function showBoss(BossNumber = 1) {
   const container = document.getElementById("boss-container") || document.body;
-  let buddyImg = document.getElementById("buddy-img");
-  if (!buddyImg) {
-    buddyImg = document.createElement("img");
-    buddyImg.id = "buddy-img";
-    buddyImg.alt = "Buddy";
+  let BossImg = document.getElementById("Boss-img");
+  if (!BossImg) {
+    BossImg = document.createElement("img");
+    BossImg.id = "Boss-img";
+    BossImg.alt = "Boss";
     container.appendChild(buddyImg);
   }
-  buddyImg.src = `assets/images/buddy${buddyNumber}.png`;
+  BossImg.src = `assets/images/Boss${BossNumber}.png`;
 }
 
 // Make sure this runs after the DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-  showBuddy(1); // Show buddy1.png on load
+  showBoss(1); // Show Boss1.png on load
 });
 
 // Sound effects
@@ -60,33 +60,36 @@ function updateBars() {
   document.getElementById("shield-bar").style.width =
     (shield / MAX_HEALTH) * 100 + "%";
 }
-function showCurrentBuddyAndBoss() {
-  // Show buddy sprite on canvas
-  showBuddyOnCanvas(currentBuddy);
-  // Only show the boss username below the sprite, no buddy name or buddy image
-  document.getElementById("buddy-name").innerHTML = `
+function showCurrentBossandBoss() {
+  // Show Boss sprite on canvas
+  showBossOnCanvas(currentBuddy);
+  // Only show the boss username below the sprite, no Boss name or buddy image
+  document.getElementById("Boss-name").innerHTML = `
     <span class="boss-username">${bossName}</span>
   `;
   document.getElementById("boss-name").textContent = `Boss: ${bossName}`;
 }
 
-function setBuddySprite(index) {
-  const buddiesDiv = document.getElementById("boss-buddies");
-  buddiesDiv.innerHTML = "";
-  const name = buddyNames[index];
+function setBossSprite(index) {
+  const bossesDiv = document.getElementById("boss-bosses");
+  bossesDiv.innerHTML = "";
+  const name = BossNames[index];
   const img = document.createElement("img");
   img.src = `assets/images/${name}.png`;
   img.alt = "Boss Sprite";
-  img.className = "buddy-sprite";
-  img.id = `buddy-${name}`;
-  buddiesDiv.appendChild(img);
+  img.className = "boss-sprite";
+  img.id = `boss-${name}`;
+  bossesDiv.appendChild(img);
 
   // Show only the boss username below the sprite
   let bossNameDiv = document.getElementById("boss-name");
   if (!bossNameDiv) {
     bossNameDiv = document.createElement("div");
     bossNameDiv.id = "boss-name";
-    buddiesDiv.parentNode.insertBefore(bossNameDiv, buddiesDiv.nextSibling);
+    bossesDiv.parentNode.insertBefore(bossNameDiv, bossesDiv.nextSibling);
   }
   bossNameDiv.innerHTML = `<span class="boss-username">${bossName}</span>`;
 }
+
+const BossNames = Array.from({ length: 14 }, (_, i) => `Boss${i + 1}`);
+// ...and so on
