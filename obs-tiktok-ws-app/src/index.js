@@ -61,5 +61,32 @@ function updateBars() {
     (shield / MAX_HEALTH) * 100 + "%";
 }
 function showCurrentBuddyAndBoss() {
-  // ...show buddy sprite and boss name...
+  // Show buddy sprite on canvas
+  showBuddyOnCanvas(currentBuddy);
+  // Only show the boss username below the sprite, no buddy name or buddy image
+  document.getElementById("buddy-name").innerHTML = `
+    <span class="boss-username">${bossName}</span>
+  `;
+  document.getElementById("boss-name").textContent = `Boss: ${bossName}`;
+}
+
+function setBuddySprite(index) {
+  const buddiesDiv = document.getElementById("boss-buddies");
+  buddiesDiv.innerHTML = "";
+  const name = buddyNames[index];
+  const img = document.createElement("img");
+  img.src = `assets/images/${name}.png`;
+  img.alt = "Boss Sprite";
+  img.className = "buddy-sprite";
+  img.id = `buddy-${name}`;
+  buddiesDiv.appendChild(img);
+
+  // Show only the boss username below the sprite
+  let bossNameDiv = document.getElementById("boss-name");
+  if (!bossNameDiv) {
+    bossNameDiv = document.createElement("div");
+    bossNameDiv.id = "boss-name";
+    buddiesDiv.parentNode.insertBefore(bossNameDiv, buddiesDiv.nextSibling);
+  }
+  bossNameDiv.innerHTML = `<span class="boss-username">${bossName}</span>`;
 }
