@@ -3,26 +3,30 @@
   <head>
     <meta charset="UTF-8" />
     <title>Kazestream TikTok Boss Overlay</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <script src="main.js"></script>
     <link rel="icon" href="data:," />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
     <!-- Health and Shield Bars -->
     <div id="hpBar"></div>
     <div id="shieldBar"></div>
-    <!-- Bottom Centered Boss Sprite and Name -->
+
+    <!-- Boss Name and Sprite -->
     <div id="bossName"></div>
     <div id="streamBoss"></div>
+
+    <!-- Top Attacker and Leaderboard -->
+    <div id="topAttacker"></div>
     <div id="leaderboard"></div>
-    <div id="how-to-play"></div>
-    <div id="boss-defeat-stats"></div>
-    <div id="boss-bosses"></div>
-    <div id="boss-name"></div>
+
+    <!-- Audio for overlay events -->
     <audio id="hitSound" src="assets/hit.mp3"></audio>
     <audio id="killSound" src="assets/kill.mp3"></audio>
     <audio id="shieldDepletedSound" src="assets/shield-depleted.mp3"></audio>
     <audio id="shieldOnSound" src="assets/shield-on.mp3"></audio>
+
+    <!-- The chat box will be created by JS if not present -->
   </body>
 </html>

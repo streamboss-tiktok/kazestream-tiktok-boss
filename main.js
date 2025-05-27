@@ -55,8 +55,8 @@ function updateBossSprite() {
   img.id = "bossSprite";
   img.src = `assets/images/Boss${boss.spriteIndex}.png`;
   img.alt = "Boss Sprite";
-  img.style.width = "128px";
-  img.style.height = "128px";
+  img.style.width = "256px";
+  img.style.height = "256px";
   img.style.transition = "filter 0.2s";
   streamBoss.appendChild(img);
 }
@@ -72,17 +72,25 @@ function bossHitEffect() {
 }
 
 function updateLeaderboard(user, damage) {
-  if (!user) return;
-  leaderboard[user] = (leaderboard[user] || 0) + damage;
+  if (user) {
+    leaderboard[user] = (leaderboard[user] || 0) + damage;
+  }
   const lbDiv = document.getElementById("leaderboard");
+  const topAttackerDiv = document.getElementById("topAttacker");
+  const sorted = Object.entries(leaderboard).sort((a, b) => b[1] - a[1]);
   if (lbDiv) {
-    lbDiv.innerHTML =
-      "<b>Top Attackers:</b><br>" +
-      Object.entries(leaderboard)
-        .sort((a, b) => b[1] - a[1])
+    lbDiv.innerHTML = "<b>Top Attackers:</b><br>" +
+      sorted
         .slice(0, 5)
         .map(([u, d]) => `${u}: ${d}`)
         .join("<br>");
+  }
+  if (topAttackerDiv) {
+    if (sorted.length > 0) {
+      topAttackerDiv.textContent = `${sorted[0][0]} is currently the top attacker`;
+    } else {
+      topAttackerDiv.textContent = "";
+    }
   }
 }
 
@@ -103,21 +111,26 @@ function handleBossDefeat(newBossName) {
   boss.name = newBossName || boss.name;
   boss.hp = boss.maxHp;
   boss.spriteIndex = Math.floor(Math.random() * bossSprites) + 1;
-  setBossName(boss.name); // This will update the bossName div
+  setBossName(boss.name);
   updateBossSprite();
-  Object.keys(leaderboard).forEach((k) => delete leaderboard[k]);
+  Object.keys(leaderboard).forEach(k => delete leaderboard[k]);
   updateLeaderboard();
+}
+
+function getDisplayName(data) {
+  return data.displayName || data.username || "User";
 }
 
 function handleEvent(user, type, amount) {
   let damage = 0;
-  if (type === "gift") {
-    // If boss is still ???, set the first gifter as boss
-    if (boss.name === "???") {
-      setBossName(user);
-    }
-    damage = 100 * amount;
-  } else if (type === "like") damage = 10 * amount;
+
+  // If boss is still ???, set the first attacker as boss
+  if (boss.name === "???") {
+    setBossName(user);
+  }
+
+  if (type === "gift") damage = 100 * amount;
+  else if (type === "like") damage = 10 * amount;
   else if (type === "share") damage = 50 * amount;
   else if (type === "follow") damage = 25 * amount;
   else if (type === "subscribe") damage = 200 * amount;
@@ -144,8 +157,9 @@ function handleEvent(user, type, amount) {
     updateLeaderboard(user, damage);
   }
 
+  // If boss is defeated, the attacker becomes the new boss
   if (boss.hp <= 0) {
-    setBossName(user); // Set the new boss name to the user who defeated the boss
+    setBossName(user);
     handleBossDefeat(user);
   }
 
@@ -158,25 +172,12 @@ function addChatMessage(username, message) {
   if (!chatBox) {
     chatBox = document.createElement("div");
     chatBox.id = "chatBox";
-    chatBox.style.position = "absolute";
-    chatBox.style.bottom = "10px";
-    chatBox.style.left = "10px";
-    chatBox.style.background = "rgba(0,0,0,0.5)";
-    chatBox.style.color = "#fff";
-    chatBox.style.padding = "8px";
-    chatBox.style.maxWidth = "300px";
-    chatBox.style.maxHeight = "200px";
-    chatBox.style.overflowY = "auto";
     document.body.appendChild(chatBox);
   }
   const div = document.createElement("div");
   div.textContent = `${username}: ${message}`;
   chatBox.appendChild(div);
   if (chatBox.children.length > 10) chatBox.removeChild(chatBox.firstChild);
-}
-
-function getDisplayName(data) {
-  return data.displayName || data.username || "User";
 }
 
 // Handle TikFinity events
@@ -215,11 +216,11 @@ socket.onmessage = function (event) {
   }
 };
 
-// On page load:
 window.onload = function () {
   updateHP();
   updateShield();
-  setBossName(boss.name); // Shows "Boss: ???" until a real username is set
+  setBossName(boss.name);
   updateBossSprite();
   updateLeaderboard();
-};
+
+};};
