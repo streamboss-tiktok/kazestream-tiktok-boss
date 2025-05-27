@@ -2,196 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kazestream TikTok Boss Overlay</title>
-    <link rel="stylesheet" href="../style.css" />
-    <script src="/socket.io/socket.io.js"></script>
-    <style>
-      body {
-        background: transparent;
-        margin: 0;
-        font-family: "Press Start 2P", monospace, Arial, sans-serif;
-        color: #fff;
-        overflow: hidden;
-      }
-      #boss-health-container {
-        width: 350px;
-        margin: 24px auto 0 auto;
-        background: rgba(0, 0, 0, 0.4);
-        border-radius: 12px;
-        box-shadow: 0 0 16px #000a;
-        padding: 12px 16px;
-        text-align: center;
-        position: relative;
-      }
-      #boss-health-bar {
-        height: 22px;
-        width: 100%;
-        background: #e74c3c;
-        border-radius: 8px;
-        margin-bottom: 6px;
-        transition: width 0.3s;
-      }
-      #boss-health-text {
-        font-size: 14px;
-        color: #fff;
-        text-shadow: 0 0 4px #000a;
-      }
-      #shield-bar {
-        height: 12px;
-        width: 0;
-        background: #3498db;
-        border-radius: 8px;
-        margin-top: 4px;
-        transition: width 0.3s;
-      }
-      #shield-text {
-        font-size: 12px;
-        color: #00ffff;
-        display: block;
-      }
-      #boss-bosses {
-        text-align: center;
-        margin-top: 18px;
-      }
-
-      .boss-username {
-        display: block;
-        font-family: "Press Start 2P", monospace;
-        color: #ff2222;
-        font-size: 18px;
-        text-shadow: 0 0 5px #ff2222, 0 0 10px #ff2222, 0 0 20px #ff2222,
-          0 0 40px #ff2222;
-        margin-top: 4px;
-      }
-      #leaderboard {
-        margin: 18px auto 0 auto;
-        width: 350px;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 8px;
-        padding: 8px 10px;
-      }
-      #leaderboard h3 {
-        font-size: 15px;
-        margin-bottom: 4px;
-        color: #ffd700;
-        text-shadow: 0 0 4px #ffd70088;
-      }
-      #leaderboard-list {
-        padding-left: 18px;
-        font-size: 13px;
-      }
-      #how-to-play {
-        margin: 18px auto 10px auto;
-        width: 350px;
-        font-size: 12px;
-        color: #fff;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 8px;
-        padding: 8px 10px;
-        font-family: "Press Start 2P", monospace;
-        line-height: 1.6;
-      }
-      #boss-defeat-stats {
-        display: none;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
+    <script src="main.js"></script>
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
   <body>
     <!-- Health and Shield Bars -->
-    <div id="boss-health-container">
-      <div id="boss-health-bar"></div>
-      <div id="shield-bar"></div>
-      <span id="boss-health-text">Boss HP: 100%</span>
-      <span id="shield-text">Shield: 0%</span>
-    </div>
-    <div id="boss-defeat-stats"></div>
-    <!-- How to Play Instructions -->
-    <div id="how-to-play"></div>
-
+    <div id="hpBar"></div>
+    <div id="shieldBar"></div>
     <!-- Bottom Centered Boss Sprite and Name -->
-    <div id="boss-bottom">
-      <div id="boss-bosses"></div>
-      <div id="boss-name"></div>
-    </div>
-
-    <!-- Leaderboard -->
-    <div id="leaderboard">
-      <h3>Top Attackers</h3>
-      <ol id="leaderboard-list"></ol>
-    </div>
-
-    <script src="main-sio.js"></script>
-    <script>
-      // Example: Show "How to Play" on load
-      showHowToPlay(`
-        <b>How to Play:</b><br />
-        Insert rose/heart me to activate tap/like or roses plus to attack the boss.<br />
-        Boss can self heal or add shield.<br />
-      `);
-
-      // Example: Update boss sprite and name
-      function setBossSprite(index, bossName) {
-        const BossNames = Array.from({ length: 14 }, (_, i) => `Boss${i + 1}`);
-        const bossesDiv = document.getElementById("boss-bosses");
-        bossesDiv.innerHTML = "";
-        const name = BossNames[index];
-        const img = document.createElement("img");
-        img.src = `assets/images/${name}.png`;
-        img.alt = "Boss Sprite";
-        img.className = "boss-sprite";
-        img.id = `boss-${name}`;
-        bossesDiv.appendChild(img);
-
-        // Show only the boss username below the sprite
-        let bossNameDiv = document.getElementById("boss-name");
-        bossNameDiv.innerHTML = `<span class="boss-username">Boss-${bossName}</span>`;
-      }
-
-      // Example: Update leaderboard
-      function updateLeaderboard(leaderboard) {
-        const list = document.getElementById("leaderboard-list");
-        list.innerHTML = "";
-        leaderboard.slice(0, 3).forEach(({ name, hits }) => {
-          const li = document.createElement("li");
-          li.textContent = `${name}: ${hits} hits`;
-          list.appendChild(li);
-        });
-      }
-
-      // Example: Show "How to Play" for 5 seconds
-      function showHowToPlay(text, duration = 5000) {
-        const howToPlay = document.getElementById("how-to-play");
-        howToPlay.innerHTML = text;
-        howToPlay.style.display = "block";
-        clearTimeout(showHowToPlay._timeout);
-        showHowToPlay._timeout = setTimeout(() => {
-          howToPlay.style.display = "none";
-        }, duration);
-      }
-
-      // Example: Show boss defeat stats for 5 seconds
-      function showBossDefeatStats(topAttackers, topBossesOfWeek) {
-        const statsDiv = document.getElementById("boss-defeat-stats");
-        let html = "<b>Boss Defeated!</b><br><br>";
-        html += "<u>Top 3 Attackers</u><br>";
-        html += "<ol style='text-align:left;'>";
-        topAttackers.forEach((attacker) => {
-          html += `<li>${attacker.name}: ${attacker.hits} hits</li>`;
-        });
-        html += "</ol>";
-        html += "<u>Top 3 Bosses of the Week</u><br>";
-        html += "<ol style='text-align:left;'>";
-        topBossesOfWeek.forEach((boss) => {
-          html += `<li>${boss.name}: ${boss.minutes} min</li>`;
-        });
-        html += "</ol>";
-        statsDiv.innerHTML = html;
-        statsDiv.style.display = "block";
-        setTimeout(() => {
-          statsDiv.style.display = "none";
-        }, 5000);
-      }
-    </script>
+    <div id="bossName"></div>
+    <div id="streamBoss"></div>
+    <div id="leaderboard"></div>
+    <div id="how-to-play"></div>
+    <div id="boss-defeat-stats"></div>
+    <div id="boss-bosses"></div>
+    <div id="boss-name"></div>
+    <audio id="hitSound" src="assets/hit.mp3"></audio>
+    <audio id="killSound" src="assets/kill.mp3"></audio>
+    <audio id="shieldDepletedSound" src="assets/shield-depleted.mp3"></audio>
+    <audio id="shieldOnSound" src="assets/shield-on.mp3"></audio>
   </body>
 </html>

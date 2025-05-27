@@ -1,212 +1,92 @@
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
-
 body {
-  font-family: "Press Start 2P", monospace;
-  color: white;
   background: transparent;
+  color: #fff;
+  font-family: "Segoe UI", Arial, sans-serif;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  height: 100vh;
-  position: relative;
+  overflow: hidden;
 }
 
-@keyframes pulse {
-  0% {
-    filter: brightness(1);
-    box-shadow: 0 0 5px red;
-  }
-  50% {
-    filter: brightness(1.5);
-    box-shadow: 0 0 20px red;
-  }
-  100% {
-    filter: brightness(1);
-    box-shadow: 0 0 5px red;
-  }
-}
-
-@keyframes boss-hit-shake {
-  0% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(-10px);
-  }
-  40% {
-    transform: translateX(10px);
-  }
-  60% {
-    transform: translateX(-8px);
-  }
-  80% {
-    transform: translateX(8px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-#boss-name,
-.bar-icon,
-#boss-health-bar {
-  animation: pulse 1.5s infinite;
-}
-
-#boss-health-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin: 16px 0;
-  width: 350px;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 12px;
-  box-shadow: 0 0 16px #000a;
-  padding: 12px 16px;
-  text-align: center;
-  position: relative;
-}
-
-#boss-health-bar {
-  height: 22px;
-  width: 100%;
-  background: #e74c3c;
+#hpBar,
+#shieldBar {
+  width: 400px;
+  height: 32px;
+  margin: 20px auto 10px auto;
   border-radius: 8px;
-  margin-bottom: 6px;
-  transition: width 0.3s;
-  position: relative;
-}
-
-#boss-health-text {
-  font-size: 14px;
-  color: #fff;
-  text-shadow: 0 0 4px #000a;
-}
-
-.bar-area {
-  position: relative;
-  width: 100%;
-  height: 20px;
-  background: #222;
-  border-radius: 8px;
-  margin: 8px 0;
-}
-
-#shield-bar {
-  height: 20px;
-  background: #3498db;
-  border-radius: 8px;
-  transition: width 0.3s;
-  width: 0;
-  opacity: 0.7;
-  position: absolute;
-  z-index: 2;
-}
-
-#health-bar {
-  height: 20px;
-  background: #e74c3c;
-  border-radius: 8px;
-  transition: width 0.3s;
-  width: 100%;
-  position: absolute;
-  z-index: 1;
-}
-
-.event-message {
-  margin-top: 12px;
-  font-size: 16px;
-  color: yellow;
-  text-align: center;
-}
-
-.error-message {
-  color: #e74c3c;
+  line-height: 32px;
   font-weight: bold;
-  margin-top: 10px;
   text-align: center;
+  font-size: 1.2em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: width 0.3s, background 0.3s;
 }
 
-#last-attacker {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #aaa;
+#hpBar {
+  background: linear-gradient(90deg, #e74c3c, #f1c40f 70%, #27ae60);
 }
 
-#shield-cost {
-  color: #0ff;
-  font-size: 0.9em;
-  margin-left: 4px;
-  font-family: inherit;
+#shieldBar {
+  background: linear-gradient(90deg, #3498db, #9b59b6);
 }
 
-.glow-red {
-  font-family: "Press Start 2P", monospace;
-  color: #ff2222;
-  background: none;
-  text-shadow: 0 0 5px #ff2222, 0 0 10px #ff2222, 0 0 20px #ff2222,
-    0 0 40px #ff2222;
-}
-
-span.glow-red {
-  display: inline-block;
-  animation: pulse 1.5s infinite;
-  font-size: 24px;
-  margin-top: 20px;
+#bossName {
   text-align: center;
+  font-size: 2em;
+  margin: 10px 0 0 0;
+  font-weight: bold;
+  text-shadow: 2px 2px 8px #000;
 }
 
-.boss-username {
-  display: block;
-  font-family: "Press Start 2P", monospace;
-  color: #ff2222;
-  font-size: 18px;
-  text-shadow: 0 0 5px #ff2222, 0 0 10px #ff2222, 0 0 20px #ff2222,
-    0 0 40px #ff2222;
-  margin-top: 4px;
-}
-
-#how-to-play {
-  font-family: "Press Start 2P", monospace;
-  color: #00ff00;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 20px;
-  animation: pulse 2s infinite;
-}
-
-#how-to-play b {
-  color: #ffcc00;
-}
-
-.boss-hit {
-  animation: boss-hit-shake 0.4s;
-}
-
-#boss-bottom {
-  position: fixed;
-  left: 50%;
-  bottom: 32px;
-  transform: translateX(-50%);
+#streamBoss {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  z-index: 10;
+  margin: 20px 0;
 }
 
-#boss-defeat-stats {
-  background: rgba(0, 0, 0, 0.8);
-  color: #ffd700;
-  font-family: "Press Start 2P", monospace;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-top: 12px;
-  text-align: center;
-  font-size: 13px;
+#streamBoss img {
+  width: 256px;
+  height: 256px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  background: #222;
+}
+
+#leaderboard {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1.1em;
+  min-width: 180px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+#how-to-play,
+#boss-defeat-stats,
+#boss-bosses,
+#boss-name {
+  display: none; /* Hide unless you want to use these */
+}
+
+audio {
+  display: none;
+}
+
+#chatBox {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 1em;
+  max-width: 320px;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  z-index: 10;
 }
