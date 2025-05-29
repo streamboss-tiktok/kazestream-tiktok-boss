@@ -1,12 +1,8 @@
 {
-  "name": "kazestream-tiktok-boss",
-  "version": "1.0.0",
   "type": "module",
-  "description": "Kazestream TikTok Boss Overlay System",
   "dependencies": {
-    "node": "^22.16.0"
-  },
-  "scripts": {
-    "start": "node server.js"
+    "node": "^22.16.0",
+    "package_name": "^1.0.0",
+    "server.js": "^1.0.0"
   }
 }
