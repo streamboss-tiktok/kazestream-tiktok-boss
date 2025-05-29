@@ -87,7 +87,7 @@ audio {
   border-radius: 10px;
   font-size: 1em;
   max-width: 320px;
-  max-height: 220px;
+  max-height: 220px; /* For chat box visibility */
   overflow-y: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   z-index: 10;
