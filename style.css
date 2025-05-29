@@ -13,14 +13,14 @@ body {
 #shieldBar {
   width: 400px;
   height: 32px;
-  margin: 20px auto 10px auto;
+  margin: 20px auto 10px;
   border-radius: 8px;
   line-height: 32px;
   font-weight: bold;
   text-align: center;
   font-size: 1.2em;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  transition: width 0.3s, background 0.3s;
+  transition: width 0.3s ease, background 0.3s ease;
 }
 
 #hpBar {
@@ -31,30 +31,18 @@ body {
   background: linear-gradient(90deg, #3498db, #9b59b6);
 }
 
-/* Boss Name positioned above the Boss Sprite at the bottom center */
-#bossName {
-  position: absolute;
-  bottom: 320px; /* Adjust this value to control the spacing above the sprite */
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 2em;
-  font-weight: bold;
-  text-align: center;
-  text-shadow: 2px 2px 8px #000;
-  margin: 0;
-}
-
-/* Boss Sprite */
+/* Boss Container */
 #streamBoss {
   position: absolute;
-  bottom: 40px; /* Sprite placed near the very bottom edge */
+  bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
 }
 
+/* Boss Sprite */
 #streamBoss img {
   width: 256px;
   height: 256px;
@@ -63,7 +51,16 @@ body {
   background: #222;
 }
 
-/* Top Attacker (upper right) */
+/* Boss Name */
+#bossName {
+  font-size: 2em;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 8px #000;
+  margin-top: 12px;
+}
+
+/* Top Attacker */
 #topAttacker {
   position: absolute;
   top: 20px;
@@ -75,7 +72,7 @@ body {
   text-shadow: 1px 1px 6px #000;
 }
 
-/* Leaderboard Widget */
+/* Leaderboard */
 #leaderboard {
   position: absolute;
   top: 60px;
@@ -88,12 +85,8 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-/* Hide chat box visuals since you don't want to display chat messages */
-#chatBox {
-  display: none;
-}
-
-/* Hide audio element display */
+/* Hide unwanted elements */
+#chatBox,
 audio {
   display: none;
 }
