@@ -9,6 +9,8 @@ const boss = {
 const leaderboard = {}; // { username: totalDamage }
 const bossSprites = 14; // Number of boss images (Boss1.png ... Boss14.png)
 const viewers = new Set();
+let shieldCooldown = false;
+let shieldCooldown = false;
 
 // Connect to TikFinity WebSocket
 const socket = new WebSocket("ws://localhost:21213/");
@@ -144,6 +146,51 @@ function handleEvent(user, type, amount) {
     setBossName(user);
   }
 
+ // Damage calculation
+if (type === "gift") damage = 100 * amount;
+else if (type === "like") damage = 10 * amount;
+else if (type === "share") damage = 50 * amount;
+else if (type === "follow") damage = 25 * amount;
+else if (type === "subscribe") damage = 200 * amount;
+
+// Shield activation for high-value gifts
+if (!shieldCooldown && boss.shield === 0 && type === "gift" && amount >= 299) {
+    boss.shield = 2000; // Shield HP equals full boss HP
+    console.log(`${boss.name} activated a shield from a high-value gift!`);
+    updateShield();
+    playSound("shieldOnSound");
+}
+
+    function depleteShield() {
+  boss.shield = 0;
+  updateShield();
+  playSound("shieldDepletedSound");
+  startShieldCooldown();  // Start the 5-minute cooldown when the shield depletes
+}
+
+  function startShieldCooldown() {
+  shieldCooldown = true;
+  setTimeout(() => {
+    shieldCooldown = false;
+    console.log(`Shield is ready to be activated again.`);
+  }, 300000); // 5-minute cooldown
+}
+
+        updateShield();
+        playSound("shieldDepletedSound");
+    }, 7000);
+
+  let shieldCooldown = false;
+}
+
+function handleEvent(user, type, amount) {
+  let damage = 0;
+
+  // If boss is still ???, set the first attacker as boss
+  if (boss.name === "???") {
+    setBossName(user);
+  }
+
   // Damage calculation
   if (type === "gift") damage = 100 * amount;
   else if (type === "like") damage = 10 * amount;
@@ -151,7 +198,16 @@ function handleEvent(user, type, amount) {
   else if (type === "follow") damage = 25 * amount;
   else if (type === "subscribe") damage = 200 * amount;
 
-  // Shield logic
+  // Shield activation for high-value gifts:
+  // Activate shield if none exists and not in cooldown
+  if (!shieldCooldown && boss.shield === 0 && type === "gift" && amount >= 299) {
+    boss.shield = 2000; // Set shield to full boss HP
+    console.log(`${boss.name} activated a shield from a high-value gift!`);
+    updateShield();
+    playSound("shieldOnSound");
+  }
+
+  // Shield logic for absorbing damage
   if (boss.shield > 0) {
     if (boss.shield >= damage) {
       boss.shield -= damage;
@@ -166,7 +222,42 @@ function handleEvent(user, type, amount) {
     }
   }
 
+  // Apply any damage to the boss HP if left over
   if (damage > 0) {
+    boss.hp -= damage;
+    bossHitEffect();
+    playSound("hitSound");
+    updateLeaderboard(user, damage);
+  }
+
+  // If boss is defeated, assign new boss logic
+  if (boss.hp <= 0) {
+    setBossName(user);
+    handleBossDefeat(user);
+  }
+
+  updateHP();
+  updateShield();
+}
+
+
+}
+ // Shield logic
+  if (boss.shield > 0) {
+    if (boss.shield >= damage) {
+      boss.shield -= damage;
+      damage = 0;
+      playSound("hitSound");
+      updateShield();
+      if (boss.shield === 0) depleteShield();
+    } else {
+      damage -= boss.shield;
+      boss.shield = 0;
+      depleteShield();
+    }
+
+  }
+ if (damage > 0) {
     boss.hp -= damage;
     bossHitEffect();
     playSound("hitSound");
