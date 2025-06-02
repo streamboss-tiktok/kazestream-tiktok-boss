@@ -1,3 +1,5 @@
+console.log("TikTok Live Connector is running!");
+
 const boss = { name: "???", hp: 2000, maxHp: 2000, shield: 0, spriteIndex: 1 };
 const leaderboard = {};
 const bossSprites = 14;
