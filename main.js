@@ -1,12 +1,25 @@
 console.log("TikTok Live Connector is running!");
 
+const socket = new WebSocket("ws://localhost:21213/");
+
+socket.addEventListener("open", () => {
+    console.log("WebSocket connected!");
+});
+socket.addEventListener("message", (event) => {
+    console.log("Received data:", event.data);
+});
+socket.addEventListener("error", (error) => {
+    console.log("WebSocket error:", error);
+});
+socket.addEventListener("close", () => {
+    console.log("WebSocket disconnected.");
+});
+
 const boss = { name: "???", hp: 2000, maxHp: 2000, shield: 0, spriteIndex: 1 };
 const leaderboard = {};
 const bossSprites = 14;
 const viewers = new Set();
 let shieldCooldown = false;
-
-const socket = new WebSocket("ws://localhost:21213/");
 
 function updateHP() {
     const hpBar = document.getElementById("hpBar");
@@ -82,6 +95,18 @@ function handleBossDamage(damage) {
     }
 }
 
+function sendTestGift() {
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({
+            user: "test_user",
+            type: "gift",
+            amount: 99
+        }));
+    } else {
+        console.log("WebSocket is not open, cannot send message.");
+    }
+}
+
 socket.addEventListener("open", () => {
     console.log("Connected to WebSocket server");
 });
@@ -124,3 +149,9 @@ updateHP();
 updateShield();
 updateBossSprite();
 setBossName(boss.name);
+
+// Example usage: call sendTestGift() from the console or after the socket opens
+// socket.onopen = () => {
+//     console.log("WebSocket connected!");
+//     sendTestGift();
+// };
