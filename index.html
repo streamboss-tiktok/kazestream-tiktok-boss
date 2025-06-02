@@ -1,32 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>Kazestream TikTok Boss Overlay</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" href="data:," />
-  </head>
-  <body>
-    <!-- Health and Shield Bars -->
+    <script defer src="main.js"></script>
+</head>
+<body>
     <div id="hpBar"></div>
     <div id="shieldBar"></div>
-
-    <!-- Boss Name and Sprite -->
-    <div id="bossName"></div>
-    <div id="streamBoss"></div>
-
-    <!-- Top Attacker and Leaderboard -->
+    <div id="streamBoss">
+        <img id="bossSprite" src="assets/images/Boss1.png" alt="Boss">
+        <div id="bossName">Boss: ???</div>
+    </div>
     <div id="topAttacker"></div>
     <div id="leaderboard"></div>
-
-    <!-- Audio for overlay events -->
-    <audio id="hitSound" src="assets/hit.mp3"></audio>
-    <audio id="killSound" src="assets/kill.mp3"></audio>
-    <audio id="shieldDepletedSound" src="assets/shield-depleted.mp3"></audio>
-    <audio id="shieldOnSound" src="assets/shield-on.mp3"></audio>
-
-    <!-- The chat box will be created by JS if not present -->
-    <script src="main.js"></script>
-  </body>
+    <audio id="hitSound" src="assets/audio/hit.mp3"></audio>
+    <audio id="killSound" src="assets/audio/kill.mp3"></audio>
+    <audio id="shieldDepletedSound" src="assets/audio/shield-depleted.mp3"></audio>
+    <audio id="shieldOnSound" src="assets/audio/shield-on.mp3"></audio>
+</body>
 </html>
+
