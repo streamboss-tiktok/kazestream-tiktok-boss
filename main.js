@@ -1,19 +1,16 @@
 console.log("TikTok Live Connector is running!");
 
-const socket = new WebSocket("ws://localhost:21213/");
+// Prevent duplicate WebSocket declarations
+if (!window.socket) {
+    window.socket = new WebSocket("ws://localhost:21213");
 
-socket.addEventListener("open", () => {
-    console.log("WebSocket connected!");
-});
-socket.addEventListener("message", (event) => {
-    console.log("Received data:", event.data);
-});
-socket.addEventListener("error", (error) => {
-    console.log("WebSocket error:", error);
-});
-socket.addEventListener("close", () => {
-    console.log("WebSocket disconnected.");
-});
+    window.socket.onopen = () => console.log("WebSocket connected!");
+    window.socket.onmessage = (event) => console.log("Received data:", event.data);
+    window.socket.onerror = (error) => console.log("WebSocket error:", error);
+    window.socket.onclose = () => console.log("WebSocket disconnected.");
+}
+
+const socket = window.socket;
 
 const boss = { name: "???", hp: 2000, maxHp: 2000, shield: 0, spriteIndex: 1 };
 const leaderboard = {};
@@ -76,16 +73,19 @@ function handleBossDamage(damage) {
     if (boss.shield > 0) {
         boss.shield = Math.max(0, boss.shield - damage);
         if (boss.shield === 0) {
-            document.getElementById("shieldDepletedSound").play();
+            const shieldDepleted = document.getElementById("shieldDepletedSound");
+            if (shieldDepleted) shieldDepleted.play();
         }
     }
-    document.getElementById("hitSound").play();
+    const hitSound = document.getElementById("hitSound");
+    if (hitSound) hitSound.play();
     updateHP();
     updateShield();
     bossHitEffect();
 
     if (boss.hp <= 0) {
-        document.getElementById("killSound").play();
+        const killSound = document.getElementById("killSound");
+        if (killSound) killSound.play();
         setTimeout(() => {
             boss.hp = boss.maxHp;
             boss.shield = 0;
@@ -112,7 +112,13 @@ socket.addEventListener("open", () => {
 });
 
 socket.addEventListener("message", (event) => {
-    const data = JSON.parse(event.data);
+    let data;
+    try {
+        data = JSON.parse(event.data);
+    } catch (e) {
+        console.log("Invalid JSON received:", event.data);
+        return;
+    }
     switch (data.type) {
         case "BOSS_NAME":
             setBossName(data.name);
@@ -131,8 +137,10 @@ socket.addEventListener("message", (event) => {
             break;
         case "TOP_ATTACKER":
             const topAttacker = document.getElementById("topAttacker");
-            topAttacker.textContent = `Top Attacker: ${data.user} (${data.damage})`;
-            setTimeout(() => topAttacker.textContent = "", 5000);
+            if (topAttacker) {
+                topAttacker.textContent = `Top Attacker: ${data.user} (${data.damage})`;
+                setTimeout(() => topAttacker.textContent = "", 5000);
+            }
             break;
         case "VIEWER_JOIN":
             viewers.add(data.user);
@@ -145,6 +153,7 @@ socket.addEventListener("message", (event) => {
     }
 });
 
+// Initialize UI on load
 updateHP();
 updateShield();
 updateBossSprite();
